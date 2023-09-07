@@ -11,6 +11,8 @@ import { DatasetsModule } from './datasets/datasets.module.js';
 import { I18nModule } from './i18n/i18n.module.js';
 import { SetupModule } from './setup/setup.module.js';
 import { UsersModule } from './users/users.module.js';
+import { ProjectModule } from './project/project.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -36,7 +38,9 @@ import { UsersModule } from './users/users.module.js';
       ttl: 60,
       limit: 100
     }),
-    UsersModule
+    UsersModule,
+    ProjectModule,
+    ProjectsModule
   ],
   providers: [
     {
