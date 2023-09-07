@@ -1,15 +1,18 @@
-import { IsDate, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 import { Dataset } from '@/datasets/schemas/dataset.schema.js';
 import { User } from '@/users/schemas/user.schema.js';
 
 export class CreateProjectDto {
+    @IsString()
   @IsNotEmpty()
   projectName: string;
 
+  @IsString()
   @IsOptional()
   projectDescription: string;
 
+  @IsString()
   @IsOptional()
   externalID: string;
 
@@ -20,6 +23,7 @@ export class CreateProjectDto {
   // users that should all have the same access to the dataset
   listOfUsers: User[];
 
+  @IsString()
   @MinLength(1)
   listOfManagers: string; // change this to refer to manager that is a user
 
