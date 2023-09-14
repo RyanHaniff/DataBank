@@ -4,7 +4,7 @@ import { Dataset } from '@/datasets/schemas/dataset.schema.js';
 import { User } from '@/users/schemas/user.schema.js';
 
 export class CreateProjectDto {
-    @IsString()
+  @IsString()
   @IsNotEmpty()
   projectName: string;
 
@@ -25,7 +25,7 @@ export class CreateProjectDto {
 
   @IsString()
   @MinLength(1)
-  listOfManagers: string; // change this to refer to manager that is a user
+  listOfManagers: User[]; // change this to refer to manager that is a user
 
   // When the project will expire
   @IsNotEmpty()
