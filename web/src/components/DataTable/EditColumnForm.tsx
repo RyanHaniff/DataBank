@@ -1,13 +1,15 @@
-import { DatasetColumnType } from '@databank/types';
-import { Form, FormValues } from '@douglasneuroinformatics/ui';
+import type { DatasetColumnType } from '@databank/types';
+import type { NullableFormDataType } from '@douglasneuroinformatics/form-types';
+import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 export type EditColumnFormData = {
   type: DatasetColumnType;
 };
 
 export type EditColumnFormProps = {
-  initialValues?: FormValues<EditColumnFormData> | null;
+  initialValues?: NullableFormDataType<EditColumnFormData> | null;
   onSubmit: (data: EditColumnFormData) => void;
 };
 
@@ -20,23 +22,16 @@ export const EditColumnForm = ({ initialValues, onSubmit }: EditColumnFormProps)
           kind: 'options',
           label: t('dataType'),
           options: {
-            STRING: t('string'),
+            FLOAT: t('float'),
             INTEGER: t('integer'),
-            FLOAT: t('float')
+            STRING: t('string')
           }
         }
       }}
       initialValues={initialValues}
-      validationSchema={{
-        type: 'object',
-        properties: {
-          type: {
-            type: 'string',
-            enum: ['FLOAT', 'INTEGER', 'STRING']
-          }
-        },
-        required: ['type']
-      }}
+      validationSchema={z.object({
+        type: z.enum(['FLOAT', 'INTEGER', 'STRING'])
+      })}
       onSubmit={onSubmit}
     />
   );

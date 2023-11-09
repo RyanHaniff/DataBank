@@ -1,10 +1,11 @@
 import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 export type CreateAccountData = {
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
 };
 
@@ -17,42 +18,18 @@ export const CreateAccountForm = ({ onSubmit }: CreateAccountFormProps) => {
   return (
     <Form<CreateAccountData>
       content={{
+        email: { kind: 'text', label: t('email'), variant: 'short' },
         firstName: { kind: 'text', label: t('firstName'), variant: 'short' },
         lastName: { kind: 'text', label: t('lastName'), variant: 'short' },
-        email: { kind: 'text', label: t('email'), variant: 'short' },
         password: { kind: 'text', label: t('password'), variant: 'password' }
       }}
       submitBtnLabel={t('submit')}
-      validationSchema={{
-        type: 'object',
-        properties: {
-          firstName: {
-            type: 'string',
-            minLength: 1
-          },
-          lastName: {
-            type: 'string',
-            minLength: 1
-          },
-          email: {
-            type: 'string',
-            pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.source
-          },
-          password: {
-            type: 'string',
-            minLength: 1
-          }
-        },
-        required: ['firstName', 'lastName', 'email', 'password'],
-        errorMessage: {
-          properties: {
-            firstName: t('requiredField'),
-            lastName: t('requiredField'),
-            email: t('validEmail'),
-            password: t('requiredField')
-          }
-        }
-      }}
+      validationSchema={z.object({
+        email: z.string().regex(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/),
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        password: z.string().min(1)
+      })}
       onSubmit={onSubmit}
     />
   );

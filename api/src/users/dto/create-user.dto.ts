@@ -1,15 +1,18 @@
 import { type UserRole } from '@databank/types';
-import { IsBoolean, IsEmail, IsIn, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateUserDto {
+  @IsNumber()
+  confirmedAt: null | number;
+
+  @IsEmail()
+  email: string;
+
   @IsNotEmpty()
   firstName: string;
 
   @IsNotEmpty()
   lastName: string;
-
-  @IsEmail()
-  email: string;
 
   @IsNotEmpty()
   password: string;
@@ -17,6 +20,6 @@ export class CreateUserDto {
   @IsIn(['admin'] satisfies UserRole[])
   role: UserRole;
 
-  @IsBoolean()
-  isVerified: boolean;
+  @IsNumber()
+  verifiedAt: null | number;
 }

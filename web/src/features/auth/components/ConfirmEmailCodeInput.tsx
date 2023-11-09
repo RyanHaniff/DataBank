@@ -1,4 +1,5 @@
-import { ChangeEvent, ClipboardEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, ClipboardEvent, KeyboardEvent } from 'react';
 
 import { useNotificationsStore } from '@douglasneuroinformatics/ui';
 import { range } from '@douglasneuroinformatics/utils';
@@ -7,21 +8,21 @@ import { useTranslation } from 'react-i18next';
 
 const CODE_LENGTH = 6;
 
-type VerificationCodeInputProps = {
+type ConfirmEmailCodeInputProps = {
   className?: string;
   onComplete: (code: number) => Promise<void>;
 };
 
-function getUpdatedDigits(digits: (number | null)[], index: number, value: number | null) {
+function getUpdatedDigits(digits: (null | number)[], index: number, value: null | number) {
   const updatedDigits = [...digits];
   updatedDigits[index] = value;
   return updatedDigits;
 }
 
-export const VerificationCodeInput = ({ className, onComplete }: VerificationCodeInputProps) => {
+export const ConfirmEmailCodeInput = ({ className, onComplete }: ConfirmEmailCodeInputProps) => {
   const notifications = useNotificationsStore();
   const { t } = useTranslation();
-  const [digits, setDigits] = useState<(number | null)[]>(range(CODE_LENGTH).map(() => null));
+  const [digits, setDigits] = useState<(null | number)[]>(range(CODE_LENGTH).map(() => null));
   const inputRefs = range(6).map(() => useRef<HTMLInputElement>(null));
 
   useEffect(() => {
@@ -32,12 +33,12 @@ export const VerificationCodeInput = ({ className, onComplete }: VerificationCod
     }
   }, [digits]);
 
-  const focusNext = (index: number) => inputRefs[index + 1 === digits.length ? 0 : index + 1].current?.focus();
+  const focusNext = (index: number) => inputRefs[index + 1 === digits.length ? 0 : index + 1]?.current?.focus();
 
-  const focusPrev = (index: number) => inputRefs[index - 1 >= 0 ? index - 1 : digits.length - 1].current?.focus();
+  const focusPrev = (index: number) => inputRefs[index - 1 >= 0 ? index - 1 : digits.length - 1]?.current?.focus();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
-    let value: number | null;
+    let value: null | number;
     if (e.target.value === '') {
       value = null;
     } else if (Number.isInteger(parseInt(e.target.value))) {
@@ -75,8 +76,8 @@ export const VerificationCodeInput = ({ className, onComplete }: VerificationCod
       setDigits(pastedDigits);
     } else {
       notifications.addNotification({
-        type: 'warning',
-        message: t('invalidCodeFormat')
+        message: t('invalidCodeFormat'),
+        type: 'warning'
       });
     }
   };

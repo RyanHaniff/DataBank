@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 
-import { DatasetEntry, TDataset } from '@databank/types';
-import { Form, FormValues } from '@douglasneuroinformatics/ui';
+import type { DatasetEntry, TDataset } from '@databank/types';
+import type { NullableFormDataType } from '@douglasneuroinformatics/form-types';
+import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
-import { InferredColumn } from './DatasetDropzone';
+import { type InferredColumn } from './DatasetDropzone';
 
 export type DatasetFormData<T extends DatasetEntry = DatasetEntry> = Omit<
   TDataset<T>,
-  '_id' | 'createdAt' | 'updatedAt' | 'owner' | 'data'
+  '_id' | 'createdAt' | 'data' | 'owner' | 'updatedAt'
 >;
 
 export type DatasetFormProps = {
@@ -19,27 +21,56 @@ export type DatasetFormProps = {
 export const DatasetForm = ({ inferredColumns, onSubmit }: DatasetFormProps) => {
   const { t } = useTranslation();
 
-  const initialValues: FormValues<DatasetFormData> = useMemo(() => {
+  const initialValues: NullableFormDataType<DatasetFormData> = useMemo(() => {
     return {
-      name: '',
-      description: '',
-      license: null,
       columns: inferredColumns.map((col) => ({
-        name: col.name,
         description: null,
+        name: col.name,
         nullable: null,
         type: col.type
-      }))
+      })),
+      description: '',
+      license: null,
+      name: ''
     };
   }, []);
 
   return (
     <Form<DatasetFormData>
       content={{
-        name: {
-          kind: 'text',
-          label: t('name'),
-          variant: 'short'
+        columns: {
+          fieldset: {
+            description: {
+              kind: 'text',
+              label: t('description'),
+              variant: 'long'
+            },
+            name: {
+              kind: 'text',
+              label: t('name'),
+              variant: 'short'
+            },
+            nullable: {
+              kind: 'binary',
+              label: t('nullable'),
+              options: {
+                f: t('no'),
+                t: t('yes')
+              },
+              variant: 'radio'
+            },
+            type: {
+              kind: 'options',
+              label: t('dataType'),
+              options: {
+                FLOAT: t('float'),
+                INTEGER: t('integer'),
+                STRING: t('string')
+              }
+            }
+          },
+          kind: 'array',
+          label: t('column')
         },
         description: {
           kind: 'text',
@@ -50,89 +81,30 @@ export const DatasetForm = ({ inferredColumns, onSubmit }: DatasetFormProps) => 
           kind: 'options',
           label: t('license'),
           options: {
-            PUBLIC_DOMAIN: t('publicDomain'),
-            OTHER: t('other')
+            OTHER: t('other'),
+            PUBLIC_DOMAIN: t('publicDomain')
           }
         },
-        columns: {
-          kind: 'array',
-          label: t('column'),
-          fieldset: {
-            name: {
-              kind: 'text',
-              label: t('name'),
-              variant: 'short'
-            },
-            description: {
-              kind: 'text',
-              label: t('description'),
-              variant: 'long'
-            },
-            type: {
-              kind: 'options',
-              label: t('dataType'),
-              options: {
-                STRING: t('string'),
-                INTEGER: t('integer'),
-                FLOAT: t('float')
-              }
-            },
-            nullable: {
-              kind: 'binary',
-              label: t('nullable'),
-              variant: 'radio',
-              options: {
-                t: t('yes'),
-                f: t('no')
-              }
-            }
-          }
+        name: {
+          kind: 'text',
+          label: t('name'),
+          variant: 'short'
         }
       }}
-      errorMessages={t('requiredField')}
       initialValues={initialValues}
-      validationSchema={{
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-            minLength: 1
-          },
-          description: {
-            type: 'string',
-            minLength: 1
-          },
-          license: {
-            type: 'string',
-            minLength: 1
-          },
-          columns: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                name: {
-                  type: 'string',
-                  minLength: 1
-                },
-                description: {
-                  type: 'string',
-                  minLength: 1
-                },
-                nullable: {
-                  type: 'boolean'
-                },
-                type: {
-                  type: 'string',
-                  enum: ['FLOAT', 'INTEGER', 'STRING']
-                }
-              },
-              required: ['description', 'name', 'nullable', 'type']
-            }
-          }
-        },
-        required: ['name', 'description', 'license', 'columns']
-      }}
+      validationSchema={z.object({
+        columns: z.array(
+          z.object({
+            description: z.string().min(1),
+            name: z.string().min(1),
+            nullable: z.boolean(),
+            type: z.enum(['FLOAT', 'INTEGER', 'STRING'])
+          })
+        ),
+        description: z.string().min(1),
+        license: z.enum(['PUBLIC_DOMAIN', 'OTHER']),
+        name: z.string().min(1)
+      })}
       onSubmit={onSubmit}
     />
   );

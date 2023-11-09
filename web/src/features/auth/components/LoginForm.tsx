@@ -1,6 +1,7 @@
-import { LoginCredentials } from '@databank/types';
+import type { LoginCredentials } from '@databank/types';
 import { Form } from '@douglasneuroinformatics/ui';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 export type LoginFormProps = {
   onSubmit: (credentials: LoginCredentials) => void;
@@ -16,26 +17,10 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
         password: { kind: 'text', label: t('password'), variant: 'password' }
       }}
       submitBtnLabel={t('login')}
-      validationSchema={{
-        type: 'object',
-        properties: {
-          email: {
-            type: 'string',
-            minLength: 1
-          },
-          password: {
-            type: 'string',
-            minLength: 1
-          }
-        },
-        required: ['email', 'password'],
-        errorMessage: {
-          properties: {
-            email: t('requiredField'),
-            password: t('requiredField')
-          }
-        }
-      }}
+      validationSchema={z.object({
+        email: z.string().min(1),
+        password: z.string().min(1)
+      })}
       onSubmit={onSubmit}
     />
   );
